@@ -105,4 +105,46 @@ const solvePart1 = (input) => {
     return res;
 }
 
-console.log(solvePart1(readAllStringsFromFile('input.txt')));
+const isGuardRouteCyclic = (map, guardStartPosition, guardInitialDirection) => {
+    let positions = new Set();
+    positions.add(guardStartPosition.join(''));
+    let guardPosition = guardStartPosition;
+    let guardDirection = guardInitialDirection;
+
+    do {
+        const newState = move(map, guardPosition, guardDirection);
+        guardPosition = [...newState.position];
+        guardDirection = newState.direction;
+
+        const positionHash = guardPosition.join(',') + guardDirection;
+        if (positions.has(positionHash)) return true;
+        positions.add(positionHash);
+    } while (isGuardStillOnTheMap(map, guardPosition));
+
+    return false
+}
+
+
+const solvePart2 = (input) => {
+    const map = input.map(row => row.split(''));
+    const { point: guardStartPosition, direction } = getGuardPosition(map);
+    let res = 0;
+
+    for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i].length; j++) {
+            if (!(i === guardStartPosition[0] && j === guardStartPosition[1])) {
+                if (map[i][j] === '#') continue;
+                const oldValue = map[i][j];
+                map[i][j] = '#';
+                const isCyclic = isGuardRouteCyclic(map, guardStartPosition, direction);
+                if (isCyclic) res++;
+                map[i][j] = oldValue;
+            }
+
+            
+        }
+    }
+
+    return res;
+}
+console.log(solvePart2(readAllStringsFromFile('input.txt')));
