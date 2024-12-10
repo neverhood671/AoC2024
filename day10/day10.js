@@ -62,4 +62,33 @@ const solvePart1 = (input) => {
     return trailHeads.reduce((acc, curr) => acc + getTrailHeadScore(curr, input), 0);
 }
 
-console.log(solvePart1(readAllStringsFromFile('./input.txt')));
+const getTrailHeadScoreV2 = (trailHead, input) => {
+    const map = input.map(line => line.split('').map(l => ({ height: parseInt(l), isVisited: false })));
+    let res = 0;
+    const stack = [trailHead];
+
+    while (stack.length > 0) {
+        const [x, y] = stack.pop();
+        if (map[x][y].height === 9) {
+            map[x][y].isVisited = true;
+            res++;
+            continue;
+        }
+
+        if (canGoRight(x, y, map)) stack.push([x, y + 1]);
+        if (canGoDown(x, y, map)) stack.push([x + 1, y]);
+        if (canGoLeft(x, y, map)) stack.push([x, y - 1]);
+        if (canGoUp(x, y, map)) stack.push([x - 1, y]);        
+    }
+
+    return res;
+}
+
+const solvePart2 = (input) => {
+    const trailHeads = getTrailHeads(input);
+
+    return trailHeads.reduce((acc, curr) => acc + getTrailHeadScoreV2(curr, input), 0);
+}
+
+
+console.log(solvePart2(readAllStringsFromFile('./input.txt')));
